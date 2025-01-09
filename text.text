@@ -1,0 +1,9 @@
+const firebaseConfig = {
+  apiKey: "AIzaSyCX_zc7RnMivmAhohfT8YLs4ur_alj9EV4",
+  authDomain: "controlealunos-2d7f2.firebaseapp.com",
+  projectId: "controlealunos-2d7f2",
+  storageBucket: "controlealunos-2d7f2.firebasestorage.app",
+  messagingSenderId: "626119939850",
+  appId: "1:626119939850:web:5b7d604166a43a1f7d4cf3",
+  measurementId: "G-6GVKXNESHF"
+};

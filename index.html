@@ -1,52 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Gerenciar Alunos por Horário</title>
-    <style>
-        
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciar Alunos</title>
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js"></script>
+  <link rel="icon" type="image/png" sizes="32x32" href="img/coruja.png">
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <div class="container">
-        <div class="logo">
-            <img src="img/sabedoria.png" alt="Logo da Empresa">
-        </div>
-        <h1>Gerenciar Alunos por Horário</h1>
-        <form id="studentForm">
-            <div class="form-group">
-                <label for="studentName">Nome do Aluno:</label>
-                <input type="text" id="studentName" placeholder="Aluno(a)" required>
-            </div>
-            <div class="form-group">
-                <label for="schedule">Horário:</label>
-                <select id="schedule" required>
-                    <option value="">Selecione um horário</option>
-                    <option value="morning">Manhã</option>
-                    <option value="afternoon">Tarde</option>
-                </select>
-            </div>
-            <button type="button" onclick="addStudent()">Adicionar Aluno</button>
-        </form>
 
-        <div class="list-container">
-            <div class="list" id="morningList">
-                <h3>Manhã</h3>
-                <ul id="morningStudents"></ul>
-                <p class="student-count" id="morningCount">Total: 0 alunos</p>
-            </div>
-            <div class="list" id="afternoonList">
-                <h3>Tarde</h3>
-                <ul id="afternoonStudents"></ul>
-                <p class="student-count" id="afternoonCount">Total: 0 alunos</p>
-            </div>
-        </div>
-        <div class="info">
-        </div>
+<body>
+  <div class="container">
+    <div class="logo">
+      <img src="img/sabedoria.png" alt="Logo da Empresa">
     </div>
-<script src="script.js"></script>
-        
+    <div class="form-group">
+      <label for="studentName">Nome do Aluno:</label>
+      <input type="text" id="studentName" placeholder="Digite o nome do aluno">
+    </div>
+    <div class="form-group">
+      <label for="studentTime">Horário:</label>
+      <select id="studentTime">
+        <option value="morning">Manhã</option>
+        <option value="afternoon">Tarde</option>
+      </select>
+    </div>
+    <button id="addStudent">Adicionar Aluno</button>
+    <div class="list-container">
+      <div class="list" id="morningList">
+        <h3>Manhã</h3>
+        <ul></ul>
+      </div>
+      <div class="list" id="afternoonList">
+        <h3>Tarde</h3>
+        <ul></ul>
+      </div>
+    </div>
+    <div class="info">
+      <p>Gerencie os alunos e seus horários!</p>
+    </div>
+  </div>
+
+  <script type="module">
+    // Importação do Firebase e Firestore
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+
+    // Configuração do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCX_zc7RnMivmAhohfT8YLs4ur_alj9EV4",
+      authDomain: "controlealunos-2d7f2.firebaseapp.com",
+      projectId: "controlealunos-2d7f2",
+      storageBucket: "controlealunos-2d7f2.firebasestorage.app",
+      messagingSenderId: "626119939850",
+      appId: "1:626119939850:web:5b7d604166a43a1f7d4cf3",
+      measurementId: "G-6GVKXNESHF"
+    };
+
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Referência às coleções
+    const studentsCollection = collection(db, "students");
+
+    // Referências aos elementos HTML
+    const studentNameInput = document.getElementById("studentName");
+    const studentTimeSelect = document.getElementById("studentTime");
+    const addStudentButton = document.getElementById("addStudent");
+    const morningList = document.getElementById("morningList").querySelector("ul");
+    const afternoonList = document.getElementById("afternoonList").querySelector("ul");
+
+    // Função para adicionar um aluno
+    addStudentButton.addEventListener("click", async () => {
+      const name = studentNameInput.value.trim();
+      const time = studentTimeSelect.value;
+
+      if (name === "") {
+        alert("Digite o nome do aluno.");
+        return;
+      }
+
+      try {
+        await addDoc(studentsCollection, { name, time });
+        studentNameInput.value = "";
+      } catch (error) {
+        console.error("Erro ao adicionar aluno:", error);
+      }
+    });
+
+    // Função para excluir um aluno
+    async function deleteStudent(id) {
+      try {
+        await deleteDoc(doc(db, "students", id));
+      } catch (error) {
+        console.error("Erro ao excluir aluno:", error);
+      }
+    }
+
+    // Atualizar listas em tempo real
+    onSnapshot(studentsCollection, (snapshot) => {
+      morningList.innerHTML = "";
+      afternoonList.innerHTML = "";
+
+      snapshot.forEach((doc) => {
+        const student = doc.data();
+        const listItem = document.createElement("li");
+        listItem.textContent = student.name;
+
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Excluir";
+        deleteButton.onclick = () => deleteStudent(doc.id);
+
+        listItem.appendChild(deleteButton);
+
+        if (student.time === "morning") {
+          morningList.appendChild(listItem);
+        } else {
+          afternoonList.appendChild(listItem);
+        }
+      });
+    });
+  </script>
 </body>
+
 </html>
