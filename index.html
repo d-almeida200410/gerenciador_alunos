@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Gerenciar Alunos por Horário</title>
+    <style>
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="img/sabedoria.png" alt="Logo da Empresa">
+        </div>
+        <h1>Gerenciar Alunos por Horário</h1>
+        <form id="studentForm">
+            <div class="form-group">
+                <label for="studentName">Nome do Aluno:</label>
+                <input type="text" id="studentName" placeholder="Aluno(a)" required>
+            </div>
+            <div class="form-group">
+                <label for="schedule">Horário:</label>
+                <select id="schedule" required>
+                    <option value="">Selecione um horário</option>
+                    <option value="morning">Manhã</option>
+                    <option value="afternoon">Tarde</option>
+                </select>
+            </div>
+            <button type="button" onclick="addStudent()">Adicionar Aluno</button>
+        </form>
+
+        <div class="list-container">
+            <div class="list" id="morningList">
+                <h3>Manhã</h3>
+                <ul id="morningStudents"></ul>
+                <p class="student-count" id="morningCount">Total: 0 alunos</p>
+            </div>
+            <div class="list" id="afternoonList">
+                <h3>Tarde</h3>
+                <ul id="afternoonStudents"></ul>
+                <p class="student-count" id="afternoonCount">Total: 0 alunos</p>
+            </div>
+        </div>
+        <div class="info">
+        </div>
+    </div>
+<script src="script.js"></script>
+        
+</body>
+</html>
